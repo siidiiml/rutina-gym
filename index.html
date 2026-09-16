@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0b0d10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gym">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Rutina Gym</title>
+<style>
+:root{
+  --bg:#0b0d10; --panel:#14181d; --panel2:#1a2027; --text:#f4f7fb;
+  --muted:#95a0ae; --line:#2a313a; --green:#7cf6b2; --blue:#8ab4ff;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg)}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;
+  min-height:100vh;padding-bottom:calc(92px + env(safe-area-inset-bottom));
+}
+.app{max-width:720px;margin:auto;padding:calc(14px + env(safe-area-inset-top)) 12px 20px}
+.hero{
+  padding:18px;border:1px solid var(--line);border-radius:24px;
+  background:linear-gradient(135deg,rgba(124,246,178,.12),rgba(138,180,255,.07));
+}
+.kicker{font-size:.72rem;font-weight:900;letter-spacing:.13em;color:var(--green);text-transform:uppercase}
+h1{font-size:2rem;line-height:1;margin:7px 0 7px}
+.subtitle{color:var(--muted);font-size:.92rem;line-height:1.45}
+.pills{display:flex;gap:7px;flex-wrap:wrap;margin-top:13px}
+.pill{font-size:.72rem;background:#101419;border:1px solid var(--line);border-radius:999px;padding:7px 10px;color:#dfe7ef}
+
+.tabs{
+  position:sticky;top:0;z-index:20;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
+  margin:8px -2px 4px;padding:10px 2px;
+  background:rgba(11,13,16,.94);backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+.tab{
+  appearance:none;-webkit-appearance:none;border:1px solid var(--line);
+  background:var(--panel);color:var(--muted);border-radius:13px;
+  padding:12px 4px;font-weight:850;font-size:.78rem;touch-action:manipulation;
+}
+.tab.active{background:var(--green);color:#07110c;border-color:var(--green)}
+
+.day{display:none}
+.day.active{display:block}
+.day-title{display:flex;justify-content:space-between;align-items:end;margin:11px 2px 10px}
+.day-title h2{margin:0;font-size:1.25rem}
+.day-title span{color:var(--muted);font-size:.75rem}
+.section{margin:17px 3px 7px;color:var(--blue);font-size:.72rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+
+.card{
+  border:1px solid var(--line);background:var(--panel);
+  border-radius:19px;margin:9px 0;overflow:hidden;
+}
+.card.done{opacity:.58;border-color:rgba(124,246,178,.35)}
+.card-head{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:13px}
+.tick{
+  appearance:none;-webkit-appearance:none;width:31px;height:31px;border-radius:10px;
+  border:1px solid var(--line);background:var(--panel2);color:#07110c;font-weight:900;
+  font-size:1rem;touch-action:manipulation;
+}
+.card.done .tick{background:var(--green);border-color:var(--green)}
+.name{font-weight:850}
+.note{font-size:.75rem;color:var(--muted);margin-top:3px;line-height:1.35}
+.dose{font-weight:900;color:var(--green);font-size:.8rem;white-space:nowrap}
+.fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;padding:0 13px 13px}
+label{font-size:.64rem;color:var(--muted);font-weight:750}
+input{
+  width:100%;margin-top:4px;padding:10px 8px;border-radius:11px;
+  border:1px solid var(--line);background:#0d1116;color:var(--text);font-size:16px;
+  outline:none;
+}
+details{border-top:1px solid var(--line);padding:10px 13px 12px;color:var(--muted);font-size:.78rem}
+summary{color:#dce4ed;font-weight:750}
+.tip{
+  border:1px solid rgba(138,180,255,.2);background:rgba(138,180,255,.07);
+  color:#dce8ff;border-radius:17px;padding:13px;margin:13px 0;font-size:.82rem;line-height:1.45
+}
+.bottom{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:calc(9px + env(safe-area-inset-bottom));
+  width:min(700px,calc(100% - 18px));display:grid;grid-template-columns:1fr auto;gap:8px;
+  padding:9px;background:rgba(20,24,29,.95);border:1px solid var(--line);border-radius:18px;
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);z-index:50
+}
+.progress{padding-left:7px;display:flex;flex-direction:column;justify-content:center}
+.progress b{font-size:.8rem}.progress span{font-size:.68rem;color:var(--muted);margin-top:2px}
+.reset{
+  border:0;border-radius:12px;padding:10px 12px;background:#252c34;color:#e7edf4;
+  font-weight:800;touch-action:manipulation
+}
+@media(max-width:390px){
+  .app{padding-left:9px;padding-right:9px}
+  .fields{gap:5px}.dose{font-size:.74rem}.tab{font-size:.72rem}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="hero">
+    <div class="kicker">Volumen • Fuerza • Atlético</div>
+    <h1>Rutina 4 días</h1>
+    <div class="subtitle">Upper / Lower repetidos. Simple, medible y hecha para progresar.</div>
+    <div class="pills"><span class="pill">Compuestos 1–2 RIR</span><span class="pill">Aislados 0–2 RIR</span><span class="pill">Potencia fresca</span></div>
+  </header>
+
+  <nav class="tabs" aria-label="Días">
+    <button type="button" class="tab active" data-target="upper1">Upper 1</button>
+    <button type="button" class="tab" data-target="lower1">Lower 1</button>
+    <button type="button" class="tab" data-target="upper2">Upper 2</button>
+    <button type="button" class="tab" data-target="lower2">Lower 2</button>
+  </nav>
+
+  <main id="days"></main>
+</div>
+
+<div class="bottom">
+  <div class="progress"><b id="progress">0/0 completados</b><span id="currentName">Upper 1</span></div>
+  <button type="button" class="reset" id="reset">Reiniciar</button>
+</div>
+
+<script>
+const DATA = {
+ upper:[
+  ["Press banca","3×5–8","Principal de fuerza de torso.","Press con mancuernas · máquina convergente · multipower"],
+  ["Remo sentado / pecho apoyado","3×6–10","Espalda, estabilidad y grosor.","Remo máquina · polea neutra · mancuerna apoyado"],
+  ["Press inclinado mancuernas","3×8–12","Más foco en pecho superior.","Barra inclinada · multipower · máquina"],
+  ["Jalón al pecho","3×8–12","Dorsal y anchura.","Dominadas · jalón unilateral"],
+  ["Elevaciones laterales","3×12–20","Hombro lateral. Cerca del fallo.","Polea unilateral · máquina"],
+  ["Curl predicador unilateral","3×8–12","Bíceps con técnica controlable.","Máquina · curl inclinado · polea"],
+  ["Extensión tríceps cuerda","3×10–15","Tríceps directo.","Barra · press francés · unilateral"],
+  ["Core","2–3 series","Elige 1–2 y progresa.","Pallof · dead bug · ab wheel · plancha con carga"]
+ ],
+ lower:[
+  ["Pogos","2×15–20","Rebote rápido. Sin buscar fatiga.",""],
+  ["Box jumps","3×3","Cada repetición explosiva.",""],
+  ["Trap-bar jump","3×3–5","Carga ligera y máxima velocidad.",""],
+  ["Hack squat / sentadilla / prensa","3×6–10","Elige una principal y mantenla.","Hack · sentadilla · prensa"],
+  ["Hip thrust","2–3×5–8","Fuerza de extensión de cadera.","Glute bridge · variante guiada"],
+  ["Peso muerto rumano","3×6–10","Isquios + bisagra.","Mancuernas · barra · multipower"],
+  ["Búlgaras","3×8–12","Unilateral y estabilidad.","Zancada atrás · split squat · step-up"],
+  ["Aductor","2–3×10–15","Fuerza de aductor.","Máquina · Copenhagen"],
+  ["Gemelos","3×10–20","Pausa y control.","De pie · sentado · prensa"],
+  ["Core","2–3 series","Cierra la sesión.","Pallof · dead bug · ab wheel"]
+ ]
+};
+
+const LABELS = {upper1:"Upper 1",lower1:"Lower 1",upper2:"Upper 2",lower2:"Lower 2"};
+const STORE = "gym-routine-v2";
+let state = {};
+try { state = JSON.parse(localStorage.getItem(STORE)||"{}"); } catch(e){}
+
+function save(){ localStorage.setItem(STORE,JSON.stringify(state)); }
+
+function makeDay(id, type){
+  const wrap = document.createElement("section");
+  wrap.className = "day" + (id==="upper1" ? " active" : "");
+  wrap.id = id;
+
+  const title = document.createElement("div");
+  title.className = "day-title";
+  title.innerHTML = `<div><h2>${LABELS[id]}</h2><span>${type==="upper"?"Torso completo":"Potencia + pierna completa"}</span></div><span>${type==="upper"?"≈ 70–85 min":"≈ 80–95 min"}</span>`;
+  wrap.appendChild(title);
+
+  if(type==="lower"){
+    const sec = document.createElement("div"); sec.className="section"; sec.textContent="Potencia → fuerza → hipertrofia"; wrap.appendChild(sec);
+  } else {
+    const sec = document.createElement("div"); sec.className="section"; sec.textContent="Compuestos → accesorios"; wrap.appendChild(sec);
+  }
+
+  DATA[type].forEach((ex,i)=>{
+    const key = id+"-"+i;
+    if(!state[key]) state[key]={done:false,peso:"",reps:"",rir:""};
+    const card=document.createElement("article"); card.className="card"+(state[key].done?" done":""); card.dataset.key=key;
+    card.innerHTML=`
+      <div class="card-head">
+        <button type="button" class="tick" aria-label="Marcar ejercicio">✓</button>
+        <div><div class="name">${ex[0]}</div><div class="note">${ex[2]}</div></div>
+        <div class="dose">${ex[1]}</div>
+      </div>
+      <div class="fields">
+        <label>Peso<input inputmode="decimal" data-field="peso" value="${state[key].peso||""}" placeholder="kg"></label>
+        <label>Reps<input data-field="reps" value="${state[key].reps||""}" placeholder="8/8/7"></label>
+        <label>RIR<input inputmode="numeric" data-field="rir" value="${state[key].rir||""}" placeholder="1–2"></label>
+      </div>
+      ${ex[3] ? `<details><summary>Alternativas</summary><div style="margin-top:7px;line-height:1.5">${ex[3]}</div></details>` : ""}
+    `;
+    wrap.appendChild(card);
+  });
+
+  const tip=document.createElement("div"); tip.className="tip";
+  tip.textContent = type==="upper"
+    ? "Descansa 2–4 min en compuestos y 1–2 min en aislamientos. Sube peso cuando completes el rango con el RIR objetivo."
+    : "La parte explosiva va siempre fresca. Si recuperas mal, recortamos volumen antes de cambiar la identidad de la sesión.";
+  wrap.appendChild(tip);
+  return wrap;
+}
+
+const days=document.getElementById("days");
+days.append(makeDay("upper1","upper"));
+days.append(makeDay("lower1","lower"));
+days.append(makeDay("upper2","upper"));
+days.append(makeDay("lower2","lower"));
+
+let current="upper1";
+
+function showDay(id){
+  current=id;
+  document.querySelectorAll(".day").forEach(el=>el.classList.toggle("active",el.id===id));
+  document.querySelectorAll(".tab").forEach(el=>el.classList.toggle("active",el.dataset.target===id));
+  document.getElementById("currentName").textContent=LABELS[id];
+  updateProgress();
+}
+
+document.querySelector(".tabs").addEventListener("click", e=>{
+  const btn=e.target.closest(".tab");
+  if(!btn) return;
+  showDay(btn.dataset.target);
+});
+
+document.getElementById("days").addEventListener("click", e=>{
+  const btn=e.target.closest(".tick");
+  if(!btn) return;
+  const card=btn.closest(".card"), key=card.dataset.key;
+  state[key].done=!state[key].done;
+  card.classList.toggle("done",state[key].done);
+  save(); updateProgress();
+});
+
+document.getElementById("days").addEventListener("input", e=>{
+  const field=e.target.dataset.field;
+  if(!field) return;
+  const card=e.target.closest(".card"), key=card.dataset.key;
+  state[key][field]=e.target.value;
+  save();
+});
+
+function updateProgress(){
+  const day=document.getElementById(current);
+  const cards=[...day.querySelectorAll(".card")];
+  const done=cards.filter(c=>c.classList.contains("done")).length;
+  document.getElementById("progress").textContent=`${done}/${cards.length} completados`;
+}
+updateProgress();
+
+document.getElementById("reset").addEventListener("click", ()=>{
+  document.querySelectorAll(`#${current} .card`).forEach(card=>{
+    const key=card.dataset.key; state[key].done=false; card.classList.remove("done");
+  });
+  save(); updateProgress();
+});
+
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>

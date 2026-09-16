@@ -1,0 +1,22 @@
+RUTINA GYM - PWA
+
+Archivos:
+- index.html
+- manifest.webmanifest
+- sw.js
+- icon-192.png
+- icon-512.png
+- apple-touch-icon.png
+
+IMPORTANTE:
+Para que funcione como app en iPhone, súbela a una web HTTPS (por ejemplo GitHub Pages,
+Netlify, Vercel, Cloudflare Pages, etc.).
+
+Después en iPhone:
+1. Abre la URL en Safari.
+2. Pulsa Compartir.
+3. Pulsa "Añadir a pantalla de inicio".
+4. Ábrela desde el icono creado.
+
+La app guarda peso, reps, RIR y ejercicios marcados usando localStorage del navegador.
+El service worker permite uso offline después de la primera carga si el hosting lo permite.
